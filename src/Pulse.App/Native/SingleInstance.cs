@@ -6,12 +6,13 @@ namespace Pulse.App.Native;
 /// <summary>
 /// One Pulse per user session. The running instance is usually elevated while a second launch (Start menu,
 /// double-click) is not, so the named objects get a DACL and a Medium integrity label that let a
-/// non-elevated process see the mutex and signal "show your window".
+/// non-elevated process see the mutex and signal "show your window" or "quit" (used by the installer).
 /// </summary>
 internal sealed class SingleInstance : IDisposable
 {
     private const string MutexName = @"Local\Pulse.SingleInstance";
     private const string ShowEventName = @"Local\Pulse.ShowWindow";
+    private const string QuitEventName = @"Local\Pulse.Quit";
     private const string Sddl = "D:(A;;GA;;;AU)S:(ML;;NW;;;ME)";
 
     private const uint SYNCHRONIZE = 0x00100000;
@@ -20,10 +21,14 @@ internal sealed class SingleInstance : IDisposable
     private const int ERROR_ALREADY_EXISTS = 183;
 
     private nint _mutex;
-    private ShowHandle? _show;
+    private EventHandle? _show;
+    private EventHandle? _quit;
 
     /// <summary>Signalled when another launch asks this instance to show its window.</summary>
     public WaitHandle? ShowRequested => _show;
+
+    /// <summary>Signalled when another process (the installer, <c>Pulse.exe --quit</c>) asks this instance to exit.</summary>
+    public WaitHandle? QuitRequested => _quit;
 
     /// <summary>True if another instance holds the mutex (even one we lack rights to open).</summary>
     public static bool IsRunning()
@@ -37,13 +42,32 @@ internal sealed class SingleInstance : IDisposable
         return Marshal.GetLastPInvokeError() == ERROR_ACCESS_DENIED;
     }
 
-    public static void SignalShow()
+    public static void SignalShow() => Signal(ShowEventName);
+
+    /// <returns>True if a running instance was asked to quit.</returns>
+    public static bool SignalQuit() => Signal(QuitEventName);
+
+    /// <summary>Waits for the running instance to finish shutting down (its mutex disappears).</summary>
+    public static bool WaitUntilGone(TimeSpan timeout)
     {
-        nint h = OpenEventW(EVENT_MODIFY_STATE, false, ShowEventName);
+        var deadline = DateTime.UtcNow + timeout;
+        while (IsRunning())
+        {
+            if (DateTime.UtcNow > deadline)
+                return false;
+            Thread.Sleep(200);
+        }
+        return true;
+    }
+
+    private static bool Signal(string eventName)
+    {
+        nint h = OpenEventW(EVENT_MODIFY_STATE, false, eventName);
         if (h == 0)
-            return;
-        SetEvent(h);
+            return false;
+        bool ok = SetEvent(h);
         CloseHandle(h);
+        return ok;
     }
 
     /// <returns>False if another instance won the race.</returns>
@@ -59,10 +83,15 @@ internal sealed class SingleInstance : IDisposable
             _mutex = 0;
             return false;
         }
-        nint ev = CreateWithSecurity(sa => CreateEventW(ref sa, false, false, ShowEventName), () => CreateEventW(0, false, false, ShowEventName));
-        if (ev != 0)
-            _show = new ShowHandle(ev);
+        _show = CreateEvent(ShowEventName);
+        _quit = CreateEvent(QuitEventName);
         return true;
+    }
+
+    private static EventHandle? CreateEvent(string name)
+    {
+        nint h = CreateWithSecurity(sa => CreateEventW(ref sa, false, false, name), () => CreateEventW(0, false, false, name));
+        return h == 0 ? null : new EventHandle(h);
     }
 
     private static nint CreateWithSecurity(Func<SECURITY_ATTRIBUTES, nint> create, Func<nint> fallback)
@@ -84,6 +113,7 @@ internal sealed class SingleInstance : IDisposable
     public void Dispose()
     {
         _show?.Dispose();
+        _quit?.Dispose();
         if (_mutex != 0)
         {
             CloseHandle(_mutex);
@@ -91,9 +121,9 @@ internal sealed class SingleInstance : IDisposable
         }
     }
 
-    private sealed class ShowHandle : WaitHandle
+    private sealed class EventHandle : WaitHandle
     {
-        public ShowHandle(nint handle) => SafeWaitHandle = new SafeWaitHandle(handle, ownsHandle: true);
+        public EventHandle(nint handle) => SafeWaitHandle = new SafeWaitHandle(handle, ownsHandle: true);
     }
 
     [StructLayout(LayoutKind.Sequential)]

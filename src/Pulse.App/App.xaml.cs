@@ -19,6 +19,8 @@ namespace Pulse.App;
 ///   --snapshot DIR     render each dashboard page to PNG after a few seconds of live data, then exit
 ///   --dump-sensors F   write every hardware sensor to a text file and exit
 ///   --exit-after S     quit after S seconds (smoke tests)
+///   --quit             ask a running Pulse to exit and wait for it (installer/uninstaller)
+///   --register-autostart / --unregister-autostart   create or remove the logon task, then exit (installer)
 /// </summary>
 public partial class App : Application
 {
@@ -48,6 +50,22 @@ public partial class App : Application
         {
             using (var writer = new StreamWriter(dumpFile))
                 SensorService.Dump(writer);
+            Shutdown();
+            return;
+        }
+
+        if (args.Contains("--quit"))
+        {
+            if (SingleInstance.SignalQuit() && !SingleInstance.WaitUntilGone(TimeSpan.FromSeconds(15)))
+                Log.Warn("--quit: running instance did not exit within 15 s");
+            Shutdown();
+            return;
+        }
+        if (args.Contains("--register-autostart") || args.Contains("--unregister-autostart"))
+        {
+            bool register = args.Contains("--register-autostart");
+            if (!(register ? AutostartTask.Enable(out string error) : AutostartTask.Disable(out error)))
+                Log.Warn($"Autostart {(register ? "registration" : "removal")} failed: {error}");
             Shutdown();
             return;
         }
@@ -99,17 +117,28 @@ public partial class App : Application
         }
     }
 
-    /// <summary>A second launch signals this event so the running instance opens its window instead.</summary>
+    /// <summary>
+    /// A second launch signals "show" so the running instance opens its window instead;
+    /// the installer signals "quit" so files can be replaced or removed after a clean shutdown.
+    /// </summary>
     private void ListenForShowRequests()
     {
-        if (_instance?.ShowRequested is not { } showRequested)
+        if (_instance is not { ShowRequested: { } show, QuitRequested: { } quit })
             return;
         var thread = new Thread(() =>
         {
             try
             {
-                while (showRequested.WaitOne())
+                while (true)
+                {
+                    if (WaitHandle.WaitAny([show, quit]) == 1)
+                    {
+                        Log.Info("Quit requested by another process.");
+                        Dispatcher.BeginInvoke(Shutdown);
+                        return;
+                    }
                     Dispatcher.BeginInvoke(() => _host?.ShowMainWindow());
+                }
             }
             catch (ObjectDisposedException)
             {
