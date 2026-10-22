@@ -1,0 +1,129 @@
+<UserControl x:Class="Pulse.App.UI.LiveView" x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sp="clr-namespace:ScottPlot.WPF;assembly=ScottPlot.WPF">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0" Margin="0,0,0,16">
+            <TextBlock Text="Live" Style="{StaticResource PageTitle}" VerticalAlignment="Center" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <Border Style="{StaticResource Chip}">
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse x:Name="GameDot" Width="8" Height="8" Fill="{StaticResource DimTextBrush}" VerticalAlignment="Center" />
+                        <TextBlock x:Name="GameText" Text="No game detected" Margin="8,0,0,0" Foreground="{StaticResource TextBrush}" />
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource Chip}">
+                    <TextBlock x:Name="OverlayText" Foreground="{StaticResource MutedTextBrush}" />
+                </Border>
+            </StackPanel>
+        </DockPanel>
+
+        <UniformGrid Grid.Row="1" Columns="4" Margin="-6,0,-6,12">
+            <!-- FPS -->
+            <Border Style="{StaticResource Card}" Margin="6,0">
+                <StackPanel>
+                    <TextBlock Text="FRAME RATE" Style="{StaticResource CardTitle}" />
+                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                        <TextBlock x:Name="FpsValue" Text="--" Style="{StaticResource BigNumber}" />
+                        <TextBlock Text="FPS" Style="{StaticResource Detail}" VerticalAlignment="Bottom" Margin="8,0,0,8" />
+                    </StackPanel>
+                    <TextBlock x:Name="FpsLows" Style="{StaticResource Detail}" />
+                    <TextBlock x:Name="FpsFrameTime" Style="{StaticResource Detail}" />
+                    <TextBlock x:Name="FpsLatency" Style="{StaticResource Detail}" />
+                    <TextBlock x:Name="FpsBottleneck" Style="{StaticResource Detail}" FontWeight="SemiBold" Margin="0,8,0,0" />
+                </StackPanel>
+            </Border>
+            <!-- GPU -->
+            <Border Style="{StaticResource Card}" Margin="6,0">
+                <StackPanel>
+                    <TextBlock x:Name="GpuTitle" Text="GPU" Style="{StaticResource CardTitle}" Foreground="{StaticResource GpuBrush}" TextTrimming="CharacterEllipsis" />
+                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                        <TextBlock x:Name="GpuLoad" Text="--" Style="{StaticResource BigNumber}" />
+                        <TextBlock Text="%" Style="{StaticResource Detail}" VerticalAlignment="Bottom" Margin="4,0,0,8" />
+                        <TextBlock x:Name="GpuTemp" Text="--" Style="{StaticResource BigNumber}" Margin="18,0,0,0" />
+                        <TextBlock Text="°C" Style="{StaticResource Detail}" VerticalAlignment="Bottom" Margin="4,0,0,8" />
+                    </StackPanel>
+                    <TextBlock x:Name="GpuLine1" Style="{StaticResource Detail}" />
+                    <TextBlock x:Name="GpuLine2" Style="{StaticResource Detail}" />
+                    <TextBlock x:Name="GpuLine3" Style="{StaticResource Detail}" />
+                </StackPanel>
+            </Border>
+            <!-- CPU -->
+            <Border Style="{StaticResource Card}" Margin="6,0">
+                <StackPanel>
+                    <TextBlock x:Name="CpuTitle" Text="CPU" Style="{StaticResource CardTitle}" Foreground="{StaticResource CpuBrush}" TextTrimming="CharacterEllipsis" />
+                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                        <TextBlock x:Name="CpuLoad" Text="--" Style="{StaticResource BigNumber}" />
+                        <TextBlock Text="%" Style="{StaticResource Detail}" VerticalAlignment="Bottom" Margin="4,0,0,8" />
+                        <TextBlock x:Name="CpuTemp" Text="--" Style="{StaticResource BigNumber}" Margin="18,0,0,0" />
+                        <TextBlock Text="°C" Style="{StaticResource Detail}" VerticalAlignment="Bottom" Margin="4,0,0,8" />
+                    </StackPanel>
+                    <TextBlock x:Name="CpuLine1" Style="{StaticResource Detail}" />
+                    <TextBlock x:Name="CpuLine2" Style="{StaticResource Detail}" />
+                    <ItemsControl x:Name="ThreadBars" Margin="0,8,0,0" Height="22">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+            <!-- Memory / PCIe -->
+            <Border Style="{StaticResource Card}" Margin="6,0">
+                <StackPanel>
+                    <TextBlock Text="MEMORY" Style="{StaticResource CardTitle}" Foreground="{StaticResource RamBrush}" />
+                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                        <TextBlock x:Name="RamUsed" Text="--" Style="{StaticResource BigNumber}" />
+                        <TextBlock x:Name="RamTotal" Text="GB" Style="{StaticResource Detail}" VerticalAlignment="Bottom" Margin="8,0,0,8" />
+                    </StackPanel>
+                    <TextBlock x:Name="RamLine" Style="{StaticResource Detail}" />
+                    <TextBlock Text="PCIe LINK" Style="{StaticResource CardTitle}" Foreground="{StaticResource PcieBrush}" Margin="0,12,0,0" />
+                    <TextBlock x:Name="PcieLine" Style="{StaticResource Detail}" />
+                    <TextBlock x:Name="PcieHealth" Style="{StaticResource Detail}" />
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Border Style="{StaticResource Card}" Margin="0,0,6,6" Padding="8,10,8,6">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="FPS · LAST 5 MIN" Style="{StaticResource CardTitle}" Margin="10,0,0,0" />
+                    <sp:WpfPlot x:Name="FpsChart" />
+                </DockPanel>
+            </Border>
+            <Border Grid.Column="1" Style="{StaticResource Card}" Margin="6,0,0,6" Padding="8,10,8,6">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="TEMPERATURE · °C" Style="{StaticResource CardTitle}" Margin="10,0,0,0" />
+                    <sp:WpfPlot x:Name="TempChart" />
+                </DockPanel>
+            </Border>
+            <Border Grid.Row="1" Style="{StaticResource Card}" Margin="0,6,6,0" Padding="8,10,8,6">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="LOAD · %" Style="{StaticResource CardTitle}" Margin="10,0,0,0" />
+                    <sp:WpfPlot x:Name="LoadChart" />
+                </DockPanel>
+            </Border>
+            <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource Card}" Margin="6,6,0,0" Padding="8,10,8,6">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="POWER · W" Style="{StaticResource CardTitle}" Margin="10,0,0,0" />
+                    <sp:WpfPlot x:Name="PowerChart" />
+                </DockPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

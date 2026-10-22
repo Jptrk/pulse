@@ -1,0 +1,75 @@
+<Application x:Class="Pulse.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             ThemeMode="Dark"
+             ShutdownMode="OnExplicitShutdown">
+    <Application.Resources>
+        <ResourceDictionary>
+            <FontFamily x:Key="NumberFont">Bahnschrift, Segoe UI</FontFamily>
+            <FontFamily x:Key="IconFont">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
+
+            <SolidColorBrush x:Key="WindowBrush" Color="#0E1116" />
+            <SolidColorBrush x:Key="SidebarBrush" Color="#0A0C10" />
+            <SolidColorBrush x:Key="CardBrush" Color="#161A21" />
+            <SolidColorBrush x:Key="CardStrokeBrush" Color="#232833" />
+            <SolidColorBrush x:Key="TextBrush" Color="#F3F6FA" />
+            <SolidColorBrush x:Key="MutedTextBrush" Color="#8A94A6" />
+            <SolidColorBrush x:Key="DimTextBrush" Color="#5B6474" />
+            <SolidColorBrush x:Key="GpuBrush" Color="#4ADE80" />
+            <SolidColorBrush x:Key="CpuBrush" Color="#60A5FA" />
+            <SolidColorBrush x:Key="RamBrush" Color="#C084FC" />
+            <SolidColorBrush x:Key="PcieBrush" Color="#2DD4BF" />
+            <SolidColorBrush x:Key="WarnBrush" Color="#FBBF24" />
+            <SolidColorBrush x:Key="HotBrush" Color="#F87171" />
+
+            <Style x:Key="Card" TargetType="Border">
+                <Setter Property="Background" Value="{StaticResource CardBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource CardStrokeBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="CornerRadius" Value="10" />
+                <Setter Property="Padding" Value="18,14" />
+            </Style>
+            <Style x:Key="CardTitle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}" />
+            </Style>
+            <Style x:Key="PageTitle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="26" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+            </Style>
+            <Style x:Key="BigNumber" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{StaticResource NumberFont}" />
+                <Setter Property="FontSize" Value="40" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+            </Style>
+            <Style x:Key="Detail" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{StaticResource NumberFont}" />
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}" />
+                <Setter Property="Margin" Value="0,3,0,0" />
+            </Style>
+            <Style x:Key="Chip" TargetType="Border">
+                <Setter Property="Background" Value="#1C212A" />
+                <Setter Property="BorderBrush" Value="{StaticResource CardStrokeBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="CornerRadius" Value="13" />
+                <Setter Property="Padding" Value="11,4" />
+                <Setter Property="Margin" Value="0,0,8,0" />
+            </Style>
+            <Style x:Key="SettingLabel" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
+            <Style x:Key="SettingHint" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}" />
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="TextWrapping" Value="Wrap" />
+                <Setter Property="Margin" Value="0,2,0,0" />
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
