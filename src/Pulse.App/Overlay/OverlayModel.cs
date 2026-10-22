@@ -14,4 +14,5 @@ internal sealed record OverlayModel(
     TimeSpan GameTime,
     IReadOnlyList<ActiveAlert> Alerts,
     double CpuHotC,
-    double GpuHotC);
+    double GpuHotC,
+    bool ShowBattery = true);

@@ -63,13 +63,24 @@ internal partial class LiveView : UserControl
         CpuLoad.Text = F0(hw?.CpuLoad);
         CpuTemp.Text = F0(hw?.CpuTempC);
         CpuTemp.Foreground = Overlay.OverlayTheme.ForTemperature(hw?.CpuTempC ?? double.NaN, _host.Settings.Alerts.CpuTempC);
-        CpuLine1.Text = $"{(hw is null || double.IsNaN(hw.CpuClockMhz) ? "--" : (hw.CpuClockMhz / 1000).ToString("0.00", Inv))} GHz  ·  {F0(hw?.CpuPowerW)} W";
+        CpuLine1.Text = $"{(hw is null || double.IsNaN(hw.CpuClockMhz) ? "--" : (hw.CpuClockMhz / 1000).ToString("0.00", Inv))} GHz  ·  {F0(hw?.CpuPowerW)} W"
+                        + (hw is { IntegratedGpu: true } ? " whole chip" : "");
         CpuLine2.Text = $"Busiest thread {F0(hw?.CpuMaxThreadLoad)}%";
         UpdateBars(hw?.ThreadLoads ?? []);
 
         RamUsed.Text = F1(hw?.RamUsedGb);
         RamTotal.Text = hw is { RamTotalGb: > 0 } ? $"/ {hw.RamTotalGb:0} GB" : "GB";
         RamLine.Text = hw is { RamTotalGb: > 0 } ? $"{hw.RamPercent:0}% in use" : "";
+
+        bool battery = hw is { HasBattery: true } && _host.Settings.Overlay.ShowBattery;
+        BatteryTitle.Visibility = BatteryLine.Visibility = battery ? Visibility.Visible : Visibility.Collapsed;
+        if (battery)
+        {
+            string state = hw!.BatteryCharging ? "charging" : hw.OnAcPower ? "plugged in" : "on battery";
+            string rate = double.IsNaN(hw.BatteryWatts) ? "" : $"  ·  {hw.BatteryWatts:0.0} W";
+            string left = double.IsNaN(hw.BatterySecondsLeft) ? "" : $"  ·  {FormatDuration(TimeSpan.FromSeconds(hw.BatterySecondsLeft))} left";
+            BatteryLine.Text = $"{F0(hw.BatteryPercent)}%  {state}{rate}{left}";
+        }
 
         var pcie = hub.Pcie;
         PcieLine.Text = pcie is null ? "Not available" : $"Gen{pcie.Gen} x{pcie.Width}  (max Gen{pcie.MaxGen} x{pcie.MaxWidth})";

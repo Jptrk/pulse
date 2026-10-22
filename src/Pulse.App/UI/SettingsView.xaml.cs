@@ -35,6 +35,7 @@ internal partial class SettingsView : UserControl
         OpacitySlider.Value = s.Overlay.BackgroundOpacity;
         StatsWindow.Text = s.Overlay.StatsWindowSeconds.ToString(Inv);
         OnlyInGame.IsChecked = s.Overlay.OnlyWhenGameDetected;
+        ShowBattery.IsChecked = s.Overlay.ShowBattery;
 
         CycleKey.Text = s.Hotkeys.CycleMode;
         HideKey.Text = s.Hotkeys.ToggleVisible;
@@ -44,6 +45,7 @@ internal partial class SettingsView : UserControl
         GpuHot.Text = s.Alerts.GpuTempC.ToString(Inv);
         VramFull.Text = s.Alerts.VramPercent.ToString(Inv);
         RamFull.Text = s.Alerts.RamPercent.ToString(Inv);
+        BatteryLow.Text = s.Alerts.BatteryLowPercent.ToString(Inv);
         PcieOn.IsChecked = s.Alerts.PcieChecks;
         PcieGen.Text = s.Alerts.ExpectedPcieGen.ToString(Inv);
         PcieWidth.Text = s.Alerts.ExpectedPcieWidth.ToString(Inv);
@@ -87,6 +89,7 @@ internal partial class SettingsView : UserControl
         s.Overlay.BackgroundOpacity = Math.Round(OpacitySlider.Value, 2);
         s.Overlay.StatsWindowSeconds = Int(StatsWindow.Text, s.Overlay.StatsWindowSeconds, 5, 300);
         s.Overlay.OnlyWhenGameDetected = OnlyInGame.IsChecked == true;
+        s.Overlay.ShowBattery = ShowBattery.IsChecked == true;
 
         s.Hotkeys.CycleMode = CycleKey.Text.Trim();
         s.Hotkeys.ToggleVisible = HideKey.Text.Trim();
@@ -96,6 +99,7 @@ internal partial class SettingsView : UserControl
         s.Alerts.GpuTempC = Num(GpuHot.Text, s.Alerts.GpuTempC, 50, 110);
         s.Alerts.VramPercent = Num(VramFull.Text, s.Alerts.VramPercent, 50, 100);
         s.Alerts.RamPercent = Num(RamFull.Text, s.Alerts.RamPercent, 50, 100);
+        s.Alerts.BatteryLowPercent = Num(BatteryLow.Text, s.Alerts.BatteryLowPercent, 0, 50);
         s.Alerts.PcieChecks = PcieOn.IsChecked == true;
         s.Alerts.ExpectedPcieGen = Int(PcieGen.Text, s.Alerts.ExpectedPcieGen, 1, 6);
         s.Alerts.ExpectedPcieWidth = Int(PcieWidth.Text, s.Alerts.ExpectedPcieWidth, 1, 16);

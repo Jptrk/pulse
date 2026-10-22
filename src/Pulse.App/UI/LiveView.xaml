@@ -87,6 +87,8 @@
                     <TextBlock Text="PCIe LINK" Style="{StaticResource CardTitle}" Foreground="{StaticResource PcieBrush}" Margin="0,12,0,0" />
                     <TextBlock x:Name="PcieLine" Style="{StaticResource Detail}" />
                     <TextBlock x:Name="PcieHealth" Style="{StaticResource Detail}" />
+                    <TextBlock x:Name="BatteryTitle" Text="BATTERY" Style="{StaticResource CardTitle}" Foreground="#A3E635" Margin="0,12,0,0" Visibility="Collapsed" />
+                    <TextBlock x:Name="BatteryLine" Style="{StaticResource Detail}" Visibility="Collapsed" />
                 </StackPanel>
             </Border>
         </UniformGrid>

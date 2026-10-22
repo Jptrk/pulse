@@ -27,6 +27,7 @@ internal static class OverlayTheme
     public static readonly Brush Ram = Solid(0xC0, 0x84, 0xFC);
     public static readonly Brush Latency = Solid(0xF4, 0x72, 0xB6);
     public static readonly Brush Pcie = Solid(0x2D, 0xD4, 0xBF);
+    public static readonly Brush Battery = Solid(0xA3, 0xE6, 0x35);
     public static readonly Brush Warn = Solid(0xFB, 0xBF, 0x24);
     public static readonly Brush Hot = Solid(0xF8, 0x71, 0x71);
     public static readonly Brush Neutral = Solid(0xA1, 0xA1, 0xAA);

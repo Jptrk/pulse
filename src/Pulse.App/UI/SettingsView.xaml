@@ -73,6 +73,7 @@
                             <TextBox x:Name="StatsWindow" Grid.Column="1" Width="80" HorizontalAlignment="Left" VerticalAlignment="Center" />
                         </Grid>
                         <CheckBox x:Name="OnlyInGame" Content="Show overlay only while a game is detected" Margin="0,8,0,0" />
+                        <CheckBox x:Name="ShowBattery" Content="Show battery on the overlay (handhelds and laptops)" Margin="0,8,0,0" />
                     </StackPanel>
                 </Border>
 
@@ -102,7 +103,7 @@
                     <StackPanel>
                         <TextBlock Text="ALERTS" Style="{StaticResource Section}" />
                         <CheckBox x:Name="AlertsOn" Content="Show warnings on the overlay" Margin="0,4,0,8" />
-                        <UniformGrid Columns="4">
+                        <UniformGrid Columns="5">
                             <StackPanel Margin="0,0,12,0">
                                 <TextBlock Text="CPU hot at (°C)" Style="{StaticResource SettingHint}" />
                                 <TextBox x:Name="CpuHot" Margin="0,4,0,0" />
@@ -115,9 +116,13 @@
                                 <TextBlock Text="VRAM full at (%)" Style="{StaticResource SettingHint}" />
                                 <TextBox x:Name="VramFull" Margin="0,4,0,0" />
                             </StackPanel>
-                            <StackPanel>
+                            <StackPanel Margin="0,0,12,0">
                                 <TextBlock Text="RAM full at (%)" Style="{StaticResource SettingHint}" />
                                 <TextBox x:Name="RamFull" Margin="0,4,0,0" />
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="Battery low at (%)" Style="{StaticResource SettingHint}" />
+                                <TextBox x:Name="BatteryLow" Margin="0,4,0,0" />
                             </StackPanel>
                         </UniformGrid>
                         <CheckBox x:Name="PcieOn" Content="Watch GPU PCIe link (under load)" Margin="0,16,0,4" />

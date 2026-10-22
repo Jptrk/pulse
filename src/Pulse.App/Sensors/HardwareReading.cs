@@ -27,6 +27,19 @@ internal sealed record HardwareReading
     public double RamUsedGb { get; init; } = double.NaN;
     public double RamTotalGb { get; init; } = double.NaN;
 
+    /// <summary>True when the GPU shares the CPU package (handhelds, laptops): CPU watts then cover the whole chip.</summary>
+    public bool IntegratedGpu { get; init; }
+
+    public bool HasBattery { get; init; }
+    public double BatteryPercent { get; init; } = double.NaN;
+    public bool BatteryCharging { get; init; }
+    public bool OnAcPower { get; init; } = true;
+
+    /// <summary>Charge or drain rate in watts (always positive; see <see cref="BatteryCharging"/>).</summary>
+    public double BatteryWatts { get; init; } = double.NaN;
+
+    public double BatterySecondsLeft { get; init; } = double.NaN;
+
     public double VramPercent => VramTotalMb > 0 ? 100 * VramUsedMb / VramTotalMb : double.NaN;
     public double RamPercent => RamTotalGb > 0 ? 100 * RamUsedGb / RamTotalGb : double.NaN;
 }

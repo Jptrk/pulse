@@ -246,6 +246,8 @@ internal sealed class PulseHost : IDisposable
             [M.PcieWidth] = pcie?.Width ?? double.NaN,
             [M.PcieReplaysRecent] = RecentReplays(),
             [M.WheaRecent] = _whea.CountSince(DateTime.UtcNow.AddMinutes(-1)),
+            [M.BatteryPercent] = hw is { HasBattery: true } ? hw.BatteryPercent : double.NaN,
+            [M.OnBattery] = hw is { HasBattery: true, OnAcPower: false } ? 1 : 0,
         };
         Hub.Alerts = _alerts.Evaluate(now / 1000, metrics);
 
@@ -281,6 +283,8 @@ internal sealed class PulseHost : IDisposable
     {
         static string T(double v) => double.IsFinite(v) ? v.ToString("0", CultureInfo.InvariantCulture) : "--";
         string text = $"Pulse\nGPU {T(hw?.GpuLoad ?? double.NaN)}% · {T(hw?.GpuTempC ?? double.NaN)}°C\nCPU {T(hw?.CpuLoad ?? double.NaN)}% · {T(hw?.CpuTempC ?? double.NaN)}°C";
+        if (hw is { HasBattery: true })
+            text += $"\nBattery {T(hw.BatteryPercent)}%" + (hw.BatteryCharging ? " charging" : hw.OnAcPower ? "" : $" · {T(hw.BatteryWatts)} W");
         if (frames is not null)
             text += $"\n{T(frames.CurrentFps)} FPS · 1% {T(frames.Window.Low1Fps)}";
         return text;

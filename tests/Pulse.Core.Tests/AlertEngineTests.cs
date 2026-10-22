@@ -80,6 +80,18 @@ public class AlertEngineTests
     }
 
     [Fact]
+    public void Low_battery_warns_only_while_discharging()
+    {
+        var e = new AlertEngine(new PulseSettings().BuildAlertRules());
+        var plugged = M((PulseSettings.Metrics.BatteryPercent, 9), (PulseSettings.Metrics.OnBattery, 0));
+        var unplugged = M((PulseSettings.Metrics.BatteryPercent, 9), (PulseSettings.Metrics.OnBattery, 1));
+
+        Assert.Empty(e.Evaluate(0, plugged));
+        Assert.Equal("Battery 9% — plug in soon", Assert.Single(e.Evaluate(1, unplugged)).Message);
+        Assert.Empty(e.Evaluate(2, plugged));
+    }
+
+    [Fact]
     public void Disabled_alerts_build_no_rules()
     {
         var settings = new PulseSettings();

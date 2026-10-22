@@ -151,7 +151,8 @@ internal sealed class OverlayController : IDisposable
             GameTime: game is null ? TimeSpan.Zero : TimeSpan.FromMilliseconds(Math.Max(0, AppClock.NowMs - game.StartedMs)),
             Alerts: _hub.Alerts,
             CpuHotC: _settings.Alerts.CpuTempC,
-            GpuHotC: _settings.Alerts.GpuTempC);
+            GpuHotC: _settings.Alerts.GpuTempC,
+            ShowBattery: _settings.Overlay.ShowBattery);
     }
 
     private void DrawGraph()

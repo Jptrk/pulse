@@ -36,6 +36,7 @@ Change them in **Settings → Hotkeys**.
 | GPU load / temp / power / clock / VRAM | ✓ (core) | ✓ | ✓ |
 | CPU load / temp / power / clock, busiest thread | ✓ (core) | ✓ | ✓ |
 | RAM | ✓ | ✓ | ✓ |
+| Battery %, drain/charge watts, time left (handhelds, laptops) | ✓ | ✓ | ✓ |
 | **GPU-bound / CPU-bound / Capped** indicator, GPU busy % | ✓ | ✓ | ✓ |
 | Display + PC latency, p99 frame time, stutter count | | | ✓ |
 | Fan rpm, VRAM junction temp, per-thread load bars | | | ✓ |
@@ -77,6 +78,17 @@ Pulse records each game session automatically. It keeps every frame time plus se
 
 > 💡 **Want the overlay with no game running?** Go to **Settings → In-game overlay**, untick **"Show overlay only while a game is detected"**, then click **Save changes**. Hardware stats stay live on your main screen; FPS shows "--" until a game starts.
 
+## 🎒 Handhelds and laptops
+
+Pulse works on handheld PCs (MSI Claw, ROG Ally, Legion Go and others) and laptops:
+- **Battery**: level, drain or charge rate in watts, and time left. It comes from the standard Windows battery interface, so it works on any device.
+- **Low-battery warning** at 15% while unplugged. Change it in **Settings → Alerts**.
+- **Chip watts**: on handhelds the CPU and GPU share one chip, so the CPU watts figure is the whole chip. Under load this matches the power mode (TDP) you set in your handheld's control app.
+- **GPU watts** show separately only where the chip reports them on their own, such as on some Intel chips.
+- **GPU memory** shows the system RAM the integrated GPU is using, including any amount reserved for it.
+
+Reading the *configured* TDP limit itself, as opposed to actual draw, would need the optional PawnIO driver, so it isn't shown.
+
 ## 🎮 Game detection
 
 - A game is the focused app drawing **20+ frames/s** that fills its monitor, sustained for 3 seconds.
@@ -102,7 +114,7 @@ Pulse is built never to touch a game process:
 - **GPU sensors** come from NVAPI/NVML, the user-mode libraries `nvidia-smi` uses.
 - **No capture-hiding tricks** (`WDA_EXCLUDEFROMCAPTURE`), because cheat overlays use them.
 
-The only kernel-level piece is **optional**: the signed PawnIO driver, which is needed only for CPU temperature and CPU power.
+The only kernel-level piece is **optional**: the signed PawnIO driver, which is needed only for CPU temperature (and integrated-GPU temperature on handhelds). CPU watts come from Windows' built-in Energy Meter counters, so they work without it.
 
 ### PawnIO gate (do this before installing the driver)
 
@@ -111,7 +123,7 @@ The only kernel-level piece is **optional**: the signed PawnIO driver, which is 
 3. Play both again.
 4. If Vanguard or Javelin shows a "blocked driver" popup, uninstall PawnIO from *Apps & features*.
 
-Pulse works fully without PawnIO, except CPU temperature and CPU power.
+Pulse works fully without PawnIO, except CPU temperature.
 
 > ⚠️ FACEIT has blocked PawnIO in the past; Vanguard and Javelin are unconfirmed either way. The worst case is a block popup, not a ban.
 
@@ -130,6 +142,7 @@ Pulse works fully without PawnIO, except CPU temperature and CPU power.
   - **CPU-bound**: GPU busy < 70%.
   - **Balanced**: anything else.
   - Uses 1 s medians. A new verdict must hold for 2 s before the label changes.
+- **CPU watts** = whole-package power from the CPU's own energy counters, read through Windows' Energy Meter. These are the same hardware counters PawnIO would read, without the driver.
 - **PCIe** is checked only after 5 s above 50% GPU load, because links slow down at idle by design.
 
 ---

@@ -45,8 +45,23 @@ internal static class OverlayPreview
             Alerts = [new ActiveAlert("cpu-hot", "CPU 91°C — running hot", 3), new ActiveAlert("pcie-gen", "PCIe Gen5 — expected Gen4", 1)],
         };
 
+        var handheld = model with
+        {
+            Hardware = hw with
+            {
+                CpuName = "Intel Core G3 Extreme", GpuName = "Intel Arc Graphics", IntegratedGpu = true, GpuPowerW = 14.2, CpuPowerW = 27.8,
+                VramUsedMb = 6100, VramTotalMb = 15800, GpuFanRpm = double.NaN, GpuMemJunctionC = double.NaN, CpuTempC = double.NaN, GpuTempC = double.NaN,
+                ThreadLoads = [55, 40, 62, 35, 48, 20, 30, 18, 25, 12, 22, 9],
+                HasBattery = true, BatteryPercent = 64, OnAcPower = false, BatteryWatts = 31.5, BatterySecondsLeft = 4320,
+            },
+            Pcie = null,
+            GameName = "Deadlock",
+        };
+
         foreach (var (name, mode, m) in new[]
                  {
+                     ("handheld-strip", OverlayMode.Strip, handheld),
+                     ("handheld-panel", OverlayMode.Panel, handheld),
                      ("strip", OverlayMode.Strip, model),
                      ("panel", OverlayMode.Panel, model),
                      ("detailed", OverlayMode.Detailed, model),

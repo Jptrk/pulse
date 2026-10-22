@@ -149,6 +149,21 @@ internal sealed class OverlayVisual : FrameworkElement
         Val(F1(hw?.RamUsedGb), "00.0");
         Unit("G");
 
+        if (m.ShowBattery && hw is { HasBattery: true })
+        {
+            Separator();
+            Label("BAT", OverlayTheme.Battery);
+            Gap(5);
+            Val(F0(hw.BatteryPercent), "100", BatteryBrush(hw));
+            Unit(hw.BatteryCharging ? "% ⚡" : "%");
+            if (!hw.BatteryCharging && !double.IsNaN(hw.BatteryWatts))
+            {
+                Gap(7);
+                Val(F1(hw.BatteryWatts), "00.0");
+                Unit("W");
+            }
+        }
+
         if (f is not null && Describe(f.Bottleneck) is { } b)
         {
             Separator();
@@ -294,6 +309,9 @@ internal sealed class OverlayVisual : FrameworkElement
         Unit(hw is { RamTotalGb: > 0 } ? $"/ {hw.RamTotalGb:0} GB" : "GB");
         EndLine();
 
+        if (m.ShowBattery && hw is { HasBattery: true })
+            BatteryLine(hw);
+
         if (detailed && m.Pcie is { } pcie)
         {
             BeginLine();
@@ -334,6 +352,31 @@ internal sealed class OverlayVisual : FrameworkElement
 
         _graphRect = new Rect(PadX, graphTop, _right - PadX, GraphHeight);
     }
+
+    private void BatteryLine(Sensors.HardwareReading hw)
+    {
+        BeginLine();
+        Label("BAT", OverlayTheme.Battery, LabelColumn);
+        Val(F0(hw.BatteryPercent), "100", BatteryBrush(hw));
+        Unit("%");
+        if (!double.IsNaN(hw.BatteryWatts))
+        {
+            Gap();
+            Val(F1(hw.BatteryWatts), "00.0");
+            Unit(hw.BatteryCharging ? "W in" : "W");
+        }
+        Gap();
+        if (hw.BatteryCharging)
+            Label("CHARGING", OverlayTheme.Battery);
+        else if (hw.OnAcPower)
+            Label("PLUGGED IN");
+        else if (!double.IsNaN(hw.BatterySecondsLeft))
+            Label($"{(int)(hw.BatterySecondsLeft / 3600)}:{(int)(hw.BatterySecondsLeft / 60 % 60):00} LEFT");
+        EndLine();
+    }
+
+    private static Brush BatteryBrush(Sensors.HardwareReading hw) =>
+        hw.OnAcPower || hw.BatteryCharging ? Value : hw.BatteryPercent <= 10 ? Hot : hw.BatteryPercent <= 20 ? Warn : Value;
 
     private void ThreadBars(float[] loads)
     {

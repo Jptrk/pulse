@@ -31,6 +31,9 @@ public sealed class OverlaySettings
     public int StatsWindowSeconds { get; set; } = 30;
     public int GraphFrames { get; set; } = 240;
     public bool ShowPerCoreBars { get; set; } = true;
+
+    /// <summary>Show battery level on the overlay when the device has one (handhelds, laptops).</summary>
+    public bool ShowBattery { get; set; } = true;
 }
 
 public sealed class HotkeySettings
@@ -55,6 +58,7 @@ public sealed class AlertSettings
     public int ExpectedPcieGen { get; set; } = 4;
     public int ExpectedPcieWidth { get; set; } = 16;
     public bool WheaChecks { get; set; } = true;
+    public double BatteryLowPercent { get; set; } = 15;
 }
 
 public sealed class GameSettings
@@ -99,6 +103,8 @@ public sealed class PulseSettings
         public const string PcieWidth = "pcie.width";
         public const string PcieReplaysRecent = "pcie.replays.recent";
         public const string WheaRecent = "whea.recent";
+        public const string BatteryPercent = "battery.pct";
+        public const string OnBattery = "battery.discharging";
     }
 
     public IReadOnlyList<AlertRule> BuildAlertRules()
@@ -122,6 +128,11 @@ public sealed class PulseSettings
                 "PCIe x{0:0} — expected x" + a.ExpectedPcieWidth, SustainSeconds: 5, GateMetric: Metrics.GpuUnderLoad));
             rules.Add(new("pcie-replays", Metrics.PcieReplaysRecent, AlertCompare.AtLeast, 1,
                 "PCIe link retries: {0:0} in last min (riser?)", SustainSeconds: 0, CooldownSeconds: 0));
+        }
+        if (a.BatteryLowPercent > 0)
+        {
+            rules.Add(new("battery-low", Metrics.BatteryPercent, AlertCompare.Below, a.BatteryLowPercent,
+                "Battery {0:0}% — plug in soon", SustainSeconds: 0, CooldownSeconds: 0, GateMetric: Metrics.OnBattery));
         }
         if (a.WheaChecks)
         {
